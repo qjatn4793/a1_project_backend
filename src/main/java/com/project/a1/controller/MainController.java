@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -14,12 +15,22 @@ public class MainController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 	
-	@GetMapping
+	@GetMapping("/search")
 	public String main() {
 		
-		logger.info("This is an info message");
+		logger.info("search");
 		
-		return "hello";
+		return "[\"농협\", \"SKB\", \"KT\", \"LG\", \"KB증권\"]";
 	}
+	
+	@GetMapping("/searchItem")
+    public String searchItem(@RequestParam String item) {
+		
+		logger.info("search");
+		
+        String itemDetails = "Details for item: " + item;
+
+        return itemDetails;
+    }
 	
 }
