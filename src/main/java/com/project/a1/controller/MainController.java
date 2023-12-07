@@ -74,7 +74,7 @@ public class MainController {
     public String handleFileUpload(@RequestParam("file") MultipartFile file) {
 
         // 받은 파일의 정보 출력 (실제로는 여기에서 파일을 처리해야 합니다.)
-        logger.info("Received file: {}" + file.getOriginalFilename());
+        logger.info("Received file: {}", file.getOriginalFilename());
 
         // 클라이언트에 응답
         return "파일 업로드를 성공했습니다.";
