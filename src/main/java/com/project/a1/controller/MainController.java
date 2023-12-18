@@ -53,11 +53,60 @@ public class MainController {
 		
 		log.info("search");
 		
-		return "[\"농협\", \"SKB\", \"KT\", \"LG\", \"KB증권\"]";
+		return "[\"농협\","
+				+ " \"SKB\","
+				+ " \"KT\","
+				+ " \"LG\","
+				+ " \"KB증권\","
+				+ " \"Kakao\","
+				+ " \"카카오\","
+				+ " \"Naver\","
+				+ " \"네이버\","
+				+ " \"Samsung\","
+				+ " \"삼성\","
+				+ " \"Samsung SDS\","
+				+ " \"삼성 SDS\","
+				+ " \"SK Telecom\","
+				+ " \"LG 일렉트로닉스\","
+				+ " \"쿠팡\","
+				+ " \"우아한 형제들\","
+				+ " \"라인\","
+				+ " \"왓챠\","
+				+ " \"직방\","
+				+ " \"야놀자\","
+				+ " \"인포뱅크\","
+				+ " \"Infobank\","
+				+ " \"잔디\","
+				+ " \"배달의민족\","
+				+ " \"토스\","
+				+ " \"마켓컬리\","
+				+ " \"지그재그\","
+				+ " \"KIA\","
+				+ " \"기아\","
+				+ " \"현대\","
+				+ " \"Hyundai\","
+				+ " \"LG CNS\","
+				+ " \"야나두\"]";
 	}
 	
 	@GetMapping("/searchItem")
     public String searchItem(@RequestParam String item) {
+		
+        return item;
+    }
+	
+	@PostMapping("/searchItem")
+    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+
+        // 받은 파일의 정보 출력 (실제로는 여기에서 파일을 처리해야 합니다.)
+		log.info("Received file: {}", file.getOriginalFilename());
+
+        // 클라이언트에 응답
+        return "파일 업로드를 성공했습니다.";
+    }
+	
+	@GetMapping("/searchResult")
+    public String searchResult(@RequestParam String item) {
 		
 		/* 임시로 주석 처리 */
         HttpHeaders headers = new HttpHeaders();
@@ -76,17 +125,7 @@ public class MainController {
     	String result = responseEntity.getBody();
     	log.info("naver : {}", result);
     	
-        return "results : " + item;
-    }
-	
-	@PostMapping("/searchItem")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
-
-        // 받은 파일의 정보 출력 (실제로는 여기에서 파일을 처리해야 합니다.)
-		log.info("Received file: {}", file.getOriginalFilename());
-
-        // 클라이언트에 응답
-        return "파일 업로드를 성공했습니다.";
+        return item;
     }
 	
 	@GetMapping("/getGptAnswer")
