@@ -1,10 +1,15 @@
 package com.project.a1.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.a1.vo.RequestBodyVO;
@@ -23,6 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class MainService {
+	
+	@Value("${openAi.api.url}")
+    private String openAi_api_url;
 	
 	@Value("${openAi.api.key}")
     private String openAi_api_key;
@@ -62,7 +71,7 @@ public class MainService {
         List<Map<String, Object>> messages = new ArrayList<>();
         Map<String, Object> system = new HashMap<>();
         system.put("role", "system");
-        system.put("content", " ");
+        system.put("content", "상담원: ");
         Map<String, Object> user = new HashMap<>();
         user.put("role", "user");
         user.put("content", "다음 대화를 완성하시오 고객: " + content);
@@ -97,7 +106,7 @@ public class MainService {
           HttpEntity<String> requestEntity = new HttpEntity<>(mapper.writeValueAsString(RequestBodyVO), headers);
           
           // API 호출
-          ResponseBodyVO response = restTemplate.exchange("https://api.openai.com/v1/chat/completions", HttpMethod.POST, requestEntity, ResponseBodyVO.class).getBody();
+          ResponseBodyVO response = restTemplate.exchange(openAi_api_url, HttpMethod.POST, requestEntity, ResponseBodyVO.class).getBody();
           result = String.valueOf(response.getChoices().get(0).getMessage().get("content"));
 
           log.info("chatGPT result: {}", result);
@@ -126,6 +135,41 @@ public class MainService {
     	
     	// 네이버 응답 값
     	return responseEntity.getBody();
+    }
+    
+    public String extractKeyword(MultipartFile file) throws IOException {
+    	int chunkSize = 2000;
+		
+		File source = new File(file.getOriginalFilename());
+		source.createNewFile();
+	    FileOutputStream fos = new FileOutputStream(source);
+	    fos.write(file.getBytes());
+	    fos.close();
+
+		PDDocument pdfDoc = PDDocument.load(source);
+		String text = new PDFTextStripper().getText(pdfDoc);
+		
+		List<String> results = splitText(text, chunkSize);
+		log.info("length: {}", results.size());
+		log.info("text: {}", results.get(0));
+		
+		text = "성공";
+
+		return text;
+    }
+    
+    public static List<String> splitText(String inputText, int chunkSize) {
+        int length = inputText.length();
+        int numOfChunks = (int) Math.ceil((double) length / chunkSize);
+        List<String> chunks = new ArrayList<>();
+
+        for (int i = 0; i < numOfChunks; i++) {
+            int startIndex = i * chunkSize;
+            int endIndex = Math.min((i + 1) * chunkSize, length);
+            chunks.add(inputText.substring(startIndex, endIndex));
+        }
+
+        return chunks;
     }
 	
 }
