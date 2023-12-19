@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.gson.Gson;
 import com.project.a1.response.ApiResponse;
 import com.project.a1.service.MainService;
+import com.project.a1.vo.SearchResultVO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,23 +32,12 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @Validated
 @RequiredArgsConstructor
 public class MainController {
 
 	private final MainService mainService;
-	
-	private final RestTemplate restTemplate = new RestTemplate();
-	
-	@Value("${naver.client.key}")
-    private String naverClientKey;
-
-    @Value("${naver.client.secret.key}")
-    private String naverClientSecretKey;
-    
-    @Value("${naver.api.url}")
-    private String naverApiUrl;
 	
 	@GetMapping("/search")
 	public String main() {
@@ -106,26 +97,18 @@ public class MainController {
     }
 	
 	@GetMapping("/searchResult")
-    public String searchResult(@RequestParam String item) {
+    public SearchResultVO searchResult(@RequestParam String item) {
 		
-		/* 임시로 주석 처리 */
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("X-Naver-Client-Id", naverClientKey);
-        headers.add("X-Naver-Client-Secret", naverClientSecretKey);
-        
-    	ResponseEntity<String> responseEntity = restTemplate.exchange(
-    			naverApiUrl + "?query=" + item + "&display=10&start=1&sort=sim",
-                HttpMethod.GET,
-                new HttpEntity<>(headers),
-                String.class
-        );
-    	
-    	// 네이버 응답 값
-    	String result = responseEntity.getBody();
-    	log.info("naver : {}", result);
-    	
-        return item;
+		// naver api 호출
+		String jsonData = mainService.getNaverApiDate(item);
+		
+		// Gson 선언
+		Gson gson = new Gson();
+		SearchResultVO searchResultVO = gson.fromJson(jsonData, SearchResultVO.class);
+		
+		log.info("searchResultVO: {}", gson.toJson(searchResultVO));
+		
+        return searchResultVO;
     }
 	
 	@GetMapping("/getGptAnswer")

@@ -10,6 +10,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,6 +44,17 @@ public class MainService {
   
     @Value("${openAi.api.presence_penalty}")
     private float openAi_api_presence_penalty;
+    
+    @Value("${naver.client.key}")
+    private String naverClientKey;
+
+    @Value("${naver.client.secret.key}")
+    private String naverClientSecretKey;
+    
+    @Value("${naver.api.url}")
+    private String naverApiUrl;
+    
+    private final RestTemplate restTemplate = new RestTemplate();
   
     public String getGPTAnswer(String content) {
         String result = null;
@@ -97,5 +109,23 @@ public class MainService {
         
         return result;
       }
+    
+    public String getNaverApiDate(String item) {
+    	
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("X-Naver-Client-Id", naverClientKey);
+        headers.add("X-Naver-Client-Secret", naverClientSecretKey);
+        
+    	ResponseEntity<String> responseEntity = restTemplate.exchange(
+    			naverApiUrl + "?query=" + item + "&display=6&start=1&sort=sim",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                String.class
+        );
+    	
+    	// 네이버 응답 값
+    	return responseEntity.getBody();
+    }
 	
 }
