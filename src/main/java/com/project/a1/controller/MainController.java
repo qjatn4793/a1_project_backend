@@ -91,12 +91,10 @@ public class MainController {
 	@GetMapping("/searchResult")
     public SearchResultVO searchResult(@RequestParam String item) {
 		
-		// naver api 호출
-		String jsonData = mainService.getNaverApiDate(item);
-		
-		// Gson 선언
 		Gson gson = new Gson();
-		SearchResultVO searchResultVO = gson.fromJson(jsonData, SearchResultVO.class);
+		
+		// naver api 호출
+		SearchResultVO searchResultVO = mainService.getNaverApiDate(item);
 		
 		log.info("searchResultVO: {}", gson.toJson(searchResultVO));
 		

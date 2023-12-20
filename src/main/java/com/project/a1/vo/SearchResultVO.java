@@ -11,4 +11,6 @@ public class SearchResultVO {
 	
 	private List<SearchItem> items;
 	
+	private List<GptItem> gptItems;
+	
 }
