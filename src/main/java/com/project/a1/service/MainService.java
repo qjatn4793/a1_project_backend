@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-<<<<<<< HEAD
 import java.util.Comparator;
-=======
->>>>>>> refs/remotes/origin/master
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;

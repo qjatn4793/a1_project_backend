@@ -1,10 +1,7 @@
 package com.project.a1.controller;
 
-<<<<<<< HEAD
 import java.util.Map;
-=======
 import java.io.IOException;
->>>>>>> refs/remotes/origin/master
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
