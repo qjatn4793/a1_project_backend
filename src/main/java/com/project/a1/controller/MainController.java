@@ -1,6 +1,5 @@
 package com.project.a1.controller;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -88,13 +87,13 @@ public class MainController {
     }
 	
 	@PostMapping("/searchItem")
-    public ApiResponse<String> handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
+    public ApiResponse<Map<String, Object>> handleFileUpload(@RequestParam("file") MultipartFile file) throws Exception {
 
         // 받은 파일의 정보 출력 (실제로는 여기에서 파일을 처리해야 합니다.)
 		log.info("Received file: {}", file.getOriginalFilename());
 
         // 클라이언트에 응답
-        return ApiResponse.success(mainService.extractKeyword(file));
+        return ApiResponse.success(mainService.analyzePDF(file));
     }
 	
 	@GetMapping("/searchResult")

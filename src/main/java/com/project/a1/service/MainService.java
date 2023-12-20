@@ -2,11 +2,17 @@ package com.project.a1.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -24,6 +30,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.a1.vo.RequestBodyVO;
 import com.project.a1.vo.ResponseBodyVO;
 
+import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
+import kr.co.shineware.nlp.komoran.core.Komoran;
+import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -137,9 +146,8 @@ public class MainService {
     	return responseEntity.getBody();
     }
     
-    public String extractKeyword(MultipartFile file) throws IOException {
-    	int chunkSize = 2000;
-		
+    public Map<String, Object> analyzePDF(MultipartFile file) throws Exception {
+    	Map<String, Object> result = new HashMap<>();
 		File source = new File(file.getOriginalFilename());
 		source.createNewFile();
 	    FileOutputStream fos = new FileOutputStream(source);
@@ -149,27 +157,53 @@ public class MainService {
 		PDDocument pdfDoc = PDDocument.load(source);
 		String text = new PDFTextStripper().getText(pdfDoc);
 		
-		List<String> results = splitText(text, chunkSize);
-		log.info("length: {}", results.size());
-		log.info("text: {}", results.get(0));
-		
-		text = "성공";
+		// 키워드
+		Map<String, Integer> topKeyWord = findTopWords(text, 10);
+		result.put("keyWord", topKeyWord);
 
-		return text;
+		return result;
     }
     
-    public static List<String> splitText(String inputText, int chunkSize) {
-        int length = inputText.length();
-        int numOfChunks = (int) Math.ceil((double) length / chunkSize);
-        List<String> chunks = new ArrayList<>();
+    public static Map<String, Integer> findTopWords(String text, int limit) {
+    	Komoran Komoran = new Komoran(DEFAULT_MODEL.LIGHT);
+		
+		//분석할 문장에 대해 정제(쓸데없는 특수문자 제거)
+		String replace_text = text.replace("[^가-힣a-zA-Z0-9", " ");
 
-        for (int i = 0; i < numOfChunks; i++) {
-            int startIndex = i * chunkSize;
-            int endIndex = Math.min((i + 1) * chunkSize, length);
-            chunks.add(inputText.substring(startIndex, endIndex));
-        }
+		//분석할 문장의 앞, 뒤에 존재할 수 있는 필요없는 공백 제거
+		String trim_text = replace_text.trim();
+		//형태소 분석 시작
+		KomoranResult analyzeResultList = Komoran.analyze(trim_text);
+		
+		//형태소 분석 결과 중 명사만 가져오기
+		List<String> rList = analyzeResultList.getNouns();
+		
+		//단어 빈도수(사과, 3) 결과를 저장하기 위해 Map객체 생성합니다.
+		Map<String, Integer> rMap = new HashMap<>();
+		
+		//List에 존재하는 중복되는 단어들의 중복제거를 위해 set 데이터타입에 데이터를 저장합니다.
+		//rSet 변수는 중복된 데이터가 저장되지 않기 떄문에 중복되지 않은 단어만 저장하고 나머지는 자동 삭제합니다.
+		Set<String> rSet = new HashSet<String>(rList);
+		
+		//중복이 제거된 단어 모음에 빈도수를 구하기 위해 반복문을 사용합니다.
+		Iterator<String> it = rSet.iterator();
+		
+		while(it.hasNext()) {
+			//중복 제거된 단어
+			String word = it.next();
+			
+			//단어가 중복 저장되어 있는 pList로부터 단어의 빈도수 가져오기
+			int frequency = Collections.frequency(rList, word);
+			
+			rMap.put(word, frequency);
+		}
+		
+		Map<String, Integer> topMap = rMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(10)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-        return chunks;
+        return topMap;
     }
 	
 }
