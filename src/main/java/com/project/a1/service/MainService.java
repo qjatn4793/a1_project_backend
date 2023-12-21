@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-<<<<<<< HEAD
 import java.util.Comparator;
-=======
->>>>>>> refs/remotes/origin/master
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -24,14 +22,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.project.a1.vo.GptItem;
 import com.project.a1.vo.RequestBodyVO;
 import com.project.a1.vo.ResponseBodyVO;
 import com.project.a1.vo.SearchResultVO;
@@ -80,13 +77,14 @@ public class MainService {
     
     private final RestTemplate restTemplate = new RestTemplate();
   
+    @Async
     public String getGPTAnswer(String content) {
         String result = null;
         RequestBodyVO RequestBodyVO = new RequestBodyVO();
         List<Map<String, Object>> messages = new ArrayList<>();
         Map<String, Object> system = new HashMap<>();
         system.put("role", "system");
-        system.put("content", "상담원: ");
+        system.put("content", "");
         Map<String, Object> user = new HashMap<>();
         user.put("role", "user");
         user.put("content", "다음 대화를 완성하시오 고객: " + content);
@@ -172,6 +170,17 @@ public class MainService {
 
 		PDDocument pdfDoc = PDDocument.load(source);
 		String text = new PDFTextStripper().getText(pdfDoc);
+		String frontText = text.substring(0, 1800).replaceAll(" ", "");
+		String backText = text.substring(text.length() - 1800, text.length() - 1).replaceAll(" ", "");
+		
+		CompletableFuture<String> apiResponseFuture1 = CompletableFuture.supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 프로젝트(사업) 배경 및 목적이 뭔지 알려줘"));
+		CompletableFuture<String> apiResponseFuture2 = CompletableFuture.supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 사업 개요를 알려줘"));
+		CompletableFuture<String> apiResponseFuture3 = CompletableFuture.supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 추진 일정을 알려줘"));
+		CompletableFuture<String> apiResponseFuture4 = CompletableFuture.supplyAsync(() -> getGPTAnswer(backText + "이 RFP에서 평가 기준이 뭔지 알려줘"));
+
+		CompletableFuture<Void> processApiResponseFuture = apiResponseFuture1.thenAcceptAsync(response -> {
+			result.put("purpose", response);
+        });
 		
 		// 키워드
 		Map<String, Integer> topKeyWord = findTopWords(text, 10);
