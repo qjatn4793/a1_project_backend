@@ -167,8 +167,8 @@ public class MainService {
 
 		PDDocument pdfDoc = PDDocument.load(source);
 		String text = new PDFTextStripper().getText(pdfDoc);
-		String frontText = text.substring(0, 1500).replaceAll(" ", "");
-		String backText = text.substring(text.length() - 1800, text.length() - 1).replaceAll(" ", "");
+		String frontText = text.substring(800, 1500).replaceAll(" ", "");
+		String backText = text.substring(text.length() - 700, text.length() - 1).replaceAll(" ", "");
         
         CompletableFuture<Void> apiResponseFuture = CompletableFuture
                 .supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 프로젝트(사업) 배경 및 목적, 사업 개요, 추진 일정을 요약해줘"))
