@@ -1,7 +1,6 @@
 package com.project.a1.controller;
 
 import java.util.Map;
-import java.io.IOException;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.gson.Gson;
 import com.project.a1.response.ApiResponse;
 import com.project.a1.service.MainService;
+import com.project.a1.vo.PdfResponseVO;
 import com.project.a1.vo.SearchResultVO;
 
 import lombok.RequiredArgsConstructor;
@@ -80,7 +80,7 @@ public class MainController {
     }
 	
 	@PostMapping("/searchItem")
-    public ApiResponse<Map<String, Object>> handleFileUpload(@RequestParam("file") MultipartFile file) throws Exception {
+    public ApiResponse<PdfResponseVO> handleFileUpload(@RequestParam("file") MultipartFile file) throws Exception {
 
         // 받은 파일의 정보 출력 (실제로는 여기에서 파일을 처리해야 합니다.)
 		log.info("Received file: {}", file.getOriginalFilename());

@@ -8,10 +8,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -21,14 +21,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.project.a1.vo.GptItem;
+import com.project.a1.vo.Keyword;
+import com.project.a1.vo.PdfResponseVO;
 import com.project.a1.vo.RequestBodyVO;
 import com.project.a1.vo.ResponseBodyVO;
 import com.project.a1.vo.SearchResultVO;
@@ -74,16 +74,14 @@ public class MainService {
     
     @Value("${naver.api.url}")
     private String naverApiUrl;
-    
-    private final RestTemplate restTemplate = new RestTemplate();
-  
+
     public String getGPTAnswer(String content) {
         String result = null;
         RequestBodyVO RequestBodyVO = new RequestBodyVO();
         List<Map<String, Object>> messages = new ArrayList<>();
         Map<String, Object> system = new HashMap<>();
         system.put("role", "system");
-        system.put("content", "상담원: ");
+        system.put("content", "");
         Map<String, Object> user = new HashMap<>();
         user.put("role", "user");
         user.put("content", "다음 대화를 완성하시오 고객: " + content);
@@ -158,9 +156,9 @@ public class MainService {
     	// 네이버 응답 값
     	return searchResultVO;
     }
-    
-    public Map<String, Object> analyzePDF(MultipartFile file) throws Exception {
-    	Map<String, Object> result = new HashMap<>();
+
+    public PdfResponseVO analyzePDF(MultipartFile file) throws Exception {
+    	PdfResponseVO result = new PdfResponseVO();
 		File source = new File(file.getOriginalFilename());
 		source.createNewFile();
 	    FileOutputStream fos = new FileOutputStream(source);
@@ -169,15 +167,34 @@ public class MainService {
 
 		PDDocument pdfDoc = PDDocument.load(source);
 		String text = new PDFTextStripper().getText(pdfDoc);
+		String frontText = text.substring(0, 1500).replaceAll(" ", "");
+		String backText = text.substring(text.length() - 1800, text.length() - 1).replaceAll(" ", "");
+        
+        CompletableFuture<Void> apiResponseFuture = CompletableFuture
+                .supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 프로젝트(사업) 배경 및 목적, 사업 개요, 추진 일정을 요약해줘"))
+                .thenCompose(summary -> CompletableFuture.supplyAsync(() -> getGPTAnswer(backText + "이 RFP에서 평가 기준이 뭔지 알려줘"))
+                .thenAccept(evaluationStandard -> {
+                	result.setSummary(summary);
+                    result.setEvaluationStandard(evaluationStandard);
+                }));
+
+        // 모든 비동기 작업이 완료될 때까지 대기
+        try {
+        	apiResponseFuture.get();
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
 		
 		// 키워드
-		Map<String, Integer> topKeyWord = findTopWords(text, 10);
-		result.put("keyWord", topKeyWord);
+        List<Keyword> topKeyWord = findTopWords(text, 10);
+		result.setKeywords(topKeyWord);
 
 		return result;
     }
     
-    public static Map<String, Integer> findTopWords(String text, int limit) {
+    public static List<Keyword> findTopWords(String text, int limit) {
+    	List<Keyword> result = new ArrayList<>();
+    	
     	Komoran Komoran = new Komoran(DEFAULT_MODEL.LIGHT);
 		
 		//분석할 문장에 대해 정제(쓸데없는 특수문자 제거)
@@ -191,9 +208,6 @@ public class MainService {
 		//형태소 분석 결과 중 명사만 가져오기
 		List<String> rList = analyzeResultList.getNouns();
 		
-		//단어 빈도수(사과, 3) 결과를 저장하기 위해 Map객체 생성합니다.
-		Map<String, Integer> rMap = new HashMap<>();
-		
 		//List에 존재하는 중복되는 단어들의 중복제거를 위해 set 데이터타입에 데이터를 저장합니다.
 		//rSet 변수는 중복된 데이터가 저장되지 않기 떄문에 중복되지 않은 단어만 저장하고 나머지는 자동 삭제합니다.
 		Set<String> rSet = new HashSet<String>(rList);
@@ -202,21 +216,23 @@ public class MainService {
 		Iterator<String> it = rSet.iterator();
 		
 		while(it.hasNext()) {
+			Keyword keyword = new Keyword();
+			
 			//중복 제거된 단어
 			String word = it.next();
 			
 			//단어가 중복 저장되어 있는 pList로부터 단어의 빈도수 가져오기
 			int frequency = Collections.frequency(rList, word);
 			
-			rMap.put(word, frequency);
+			keyword.setText(word);
+			keyword.setValue(frequency);
+			
+			result.add(keyword);
 		}
 		
-		Map<String, Integer> topMap = rMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .limit(10)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+		result = result.stream().sorted(Comparator.comparing(Keyword::getValue).reversed()).collect(Collectors.toList()).subList(0, Math.min(result.size(), limit));
 
-        return topMap;
+        return result;
     }
     
     
