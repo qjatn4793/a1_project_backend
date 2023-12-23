@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class PdfResponseVO {
 
+	private String company;
 	private List<Keyword> Keywords;
 	private String summary;
 	private String evaluationStandard;

@@ -74,6 +74,9 @@ public class MainService {
     
     @Value("${naver.api.url}")
     private String naverApiUrl;
+    
+    // RestTemplate 생성
+    RestTemplate restTemplate = new RestTemplate();
 
     public String getGPTAnswer(String content) {
         String result = null;
@@ -91,9 +94,6 @@ public class MainService {
         stop.add("고객:");
         
         try {
-          // RestTemplate 생성
-          RestTemplate restTemplate = new RestTemplate();
-
           // 요청 헤더 생성
           HttpHeaders headers = new HttpHeaders();
           headers.setContentType(MediaType.APPLICATION_JSON);
@@ -167,8 +167,10 @@ public class MainService {
 
 		PDDocument pdfDoc = PDDocument.load(source);
 		String text = new PDFTextStripper().getText(pdfDoc);
-		String frontText = text.substring(800, 1500).replaceAll(" ", "");
+		String frontText = text.substring(0, 300).replaceAll(" ", "");
 		String backText = text.substring(text.length() - 700, text.length() - 1).replaceAll(" ", "");
+		// 첫 문장을 기업명으로 예상 (추후 보완 필요)
+		result.setCompany(file.getOriginalFilename().split(" ")[0]);
         
         CompletableFuture<Void> apiResponseFuture = CompletableFuture
                 .supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 프로젝트(사업) 배경 및 목적, 사업 개요, 추진 일정을 요약해줘"))
@@ -177,7 +179,7 @@ public class MainService {
                 	result.setSummary(summary);
                     result.setEvaluationStandard(evaluationStandard);
                 }));
-
+        
         // 모든 비동기 작업이 완료될 때까지 대기
         try {
         	apiResponseFuture.get();
