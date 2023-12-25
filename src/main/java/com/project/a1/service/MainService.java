@@ -21,6 +21,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -131,14 +132,14 @@ public class MainService {
     
     public SearchResultVO getNaverApiDate(String item) {
     	
-    	/*
     	HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("X-Naver-Client-Id", naverClientKey);
         headers.add("X-Naver-Client-Secret", naverClientSecretKey);
         
+        /*
     	ResponseEntity<String> responseEntity = restTemplate.exchange(
-    			naverApiUrl + "?query=" + item + "&display=10&start=1&sort=sim",
+    			naverApiUrl + "?query=" + item + "&display=12&start=1&sort=sim",
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 String.class
@@ -147,11 +148,13 @@ public class MainService {
     	Gson gson = new Gson();
     	
     	SearchResultVO searchResultVO = gson.fromJson(responseEntity.getBody(), SearchResultVO.class);
+    	List<Keyword> topKeyWord = findTopWords(responseEntity.getBody(), 10);
+    	searchResultVO.setKeywords(topKeyWord);
     	*/
     	
     	Gson gson = new Gson();
     	
-    	SearchResultVO searchResultVO = gson.fromJson("{\"items\":[{\"title\":\"[금융 이모저모] NH\\u003cb\\u003e농협\\u003c/b\\u003e은행 IT사랑봉사단, 쌀 나눔 행사 실시\",\"originallink\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d308922\",\"link\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d308922\",\"description\":\"NH\\u003cb\\u003e농협\\u003c/b\\u003e은행 IT사랑봉사단이 지난 24일 지난 24일 경기 안양시 관내 복지관을 찾아 쌀 1500Kg을 전달했다고... ○...카카오뱅크, \\u0027금융 분야 최대\\u0027 AI 국제 학회서 국내 은행 최초로 논문 발표...\\u0026quot;\\u003cb\\u003eAICC\\u003c/b\\u003e 기술력 인정받아... \",\"pubDate\":\"Tue, 28 Nov 2023 08:51:00 +0900\"},{\"title\":\"\\u003cb\\u003e농협\\u003c/b\\u003e중앙회, 범\\u003cb\\u003e농협\\u003c/b\\u003e 인공지능콘택트센터 구축한다\",\"originallink\":\"https://www.etnews.com/20231018000212\",\"link\":\"https://n.news.naver.com/mnews/article/030/0003146467?sid\\u003d101\",\"description\":\"\\u003cb\\u003e농협\\u003c/b\\u003e중앙회는 최근 \\u003cb\\u003e농협\\u003c/b\\u003e은행, 상호금융, \\u003cb\\u003e농협\\u003c/b\\u003e생명, 손해보험 등 계열사를 아우르는 \\u0027범\\u003cb\\u003e농협\\u003c/b\\u003e NH \\u003cb\\u003eAICC\\u003c/b\\u003e 구축\\u0027에 돌입했다. 계열사 간 표준화된 \\u003cb\\u003eAICC\\u003c/b\\u003e 모델을 운영해 업무 효율성을 높인다는 방침이다. \\u003cb\\u003e농협\\u003c/b\\u003e중앙회는 올해... \",\"pubDate\":\"Wed, 18 Oct 2023 14:16:00 +0900\"},{\"title\":\"챗GPT 컨택센터에도 접목…범\\u003cb\\u003e농협 AICC\\u003c/b\\u003e구축 추진\",\"originallink\":\"https://www.ddaily.co.kr/news/article.html?no\\u003d260669\",\"link\":\"https://n.news.naver.com/mnews/article/138/0002145443?sid\\u003d105\",\"description\":\"31일 관련업계에 따르면 농협이 ‘범\\u003cb\\u003e농협 AICC\\u003c/b\\u003e(AI 컨택센터) 구축 컨설팅’ 사업을 발주하고 사업자 선정을 마무리하고 컨설팅 사업에 들어간다. 농협은 챗GPT 등 AI 기술의 혁신적인 변화에 대응하는 한편 금융권의 AICC... \",\"pubDate\":\"Fri, 31 Mar 2023 10:08:00 +0900\"},{\"title\":\"[주간 서머리] 경제·산업계 \\u0026quot;작년 5대 은행 직원 연봉 1억원 넘어·대형 건설...\",\"originallink\":\"http://www.asiaa.co.kr/news/articleView.html?idxno\\u003d146111\",\"link\":\"http://www.asiaa.co.kr/news/articleView.html?idxno\\u003d146111\",\"description\":\"NH\\u003cb\\u003e농협\\u003c/b\\u003e은행 2억2513만원이다. [사진\\u003dLG유플러스] ◇IT·전자업계 소식 △LG유플러스, \\u0027AI 3대 서비스\\u0027 로 B2B 시장 공략 박차\\u003dLG유플러스가 \\u003cb\\u003eAICC\\u003c/b\\u003e와 소상공인 AI 솔루션을 기반으로 B2B AI 사업을 본격화한다. 구체적으로 △\\u0027U... \",\"pubDate\":\"Fri, 03 Nov 2023 17:02:00 +0900\"},{\"title\":\"\\u003cb\\u003e농협\\u003c/b\\u003e중앙회, 디지털혁신위원회 개최... 빅데이터플랫폼, 인공지능 고객센터 등...\",\"originallink\":\"https://www.aitimes.kr/news/articleView.html?idxno\\u003d28349\",\"link\":\"https://www.aitimes.kr/news/articleView.html?idxno\\u003d28349\",\"description\":\"이날 회의는 이재식 \\u003cb\\u003e농협\\u003c/b\\u003e중앙회 부회장(위원장)을 비롯한 15명의 내·외부 디지털혁신위원이 참석한 가운데 \\u0027범\\u003cb\\u003e농협\\u003c/b\\u003e 빅데이터플랫폼(N-Hub)\\u0027, \\u0027인공지능 컨택센터(\\u003cb\\u003eAICC\\u003c/b\\u003e)\\u0027,  \\u0027데이터비즈니스\\u0027 등 범\\u003cb\\u003e농협\\u003c/b\\u003e 디지털혁신을 위한... \",\"pubDate\":\"Mon, 26 Jun 2023 21:34:00 +0900\"},{\"title\":\"[인터뷰] 양정기 \\u003cb\\u003e농협\\u003c/b\\u003e은행 콜인프라운영팀 팀장 \\u0027AI콜봇RPA\\u0027 통한 \\u0027고도화\\u0027\",\"originallink\":\"http://www.newsprime.co.kr/news/article.html?no\\u003d586219\",\"link\":\"http://www.newsprime.co.kr/news/article.html?no\\u003d586219\",\"description\":\"그는 \\u0026quot;이번 프로젝트에서 AI가 전화 상담부터 업무처리까지 완료하는 시스템을 구축했다\\u0026quot;며 \\u0026quot;진보된 \\u003cb\\u003eAICC\\u003c/b\\u003e로의 진화와 함께 상담사 업무 경감에 도움이 되고자 한다\\u0026quot;라고 추진 배경에 관해 설명했다. \\u003cb\\u003e농협\\u003c/b\\u003e은행... \",\"pubDate\":\"Mon, 28 Nov 2022 14:12:00 +0900\"},{\"title\":\"KT, 기업 DX 방안 \\u0027\\u003cb\\u003eAICC\\u003c/b\\u003e 기술\\u0027 제안…AI 콜센터 도입한 결과는?\",\"originallink\":\"http://www.aitimes.com/news/articleView.html?idxno\\u003d139052\",\"link\":\"http://www.aitimes.com/news/articleView.html?idxno\\u003d139052\",\"description\":\"KT는 AI와 DX기술을 융합한 \\u0027AI컨택센터(\\u003cb\\u003eAICC\\u003c/b\\u003e)\\u0027를 효율적으로 잘 운영해 성과를 내고 있다고 밝혔다. 기존... NH\\u003cb\\u003e농협\\u003c/b\\u003e손해보험, 라이나생명 등 은행, 카드, 보험, 핀테크 등 금융 분야의 다양한 고객이 \\u0027KT 클라우드\\u0027를... \",\"pubDate\":\"Thu, 17 Jun 2021 11:18:00 +0900\"},{\"title\":\"\\u0027은행 맏형\\u0027으로 복귀한 조용병 전 신한금융 회장\",\"originallink\":\"http://news.bizwatch.co.kr/article/finance/2023/11/17/0027\",\"link\":\"https://n.news.naver.com/mnews/article/648/0000021118?sid\\u003d101\",\"description\":\"전 \\u003cb\\u003e농협\\u003c/b\\u003e중앙회 부회장 등에 이어 다섯번째다. 조 전 회장은 은행장 및 회장 시절 금융당국과 함께 다양한... 신한금융, 그룹통합 AI 컨택센터 \\u0027\\u003cb\\u003eAICC\\u003c/b\\u003e\\u0027 구축 신한금융그룹은 그룹 통합 AI 컨택센터(\\u003cb\\u003eAICC\\u003c/b\\u003e·AI Contact Center) 플랫폼... \",\"pubDate\":\"Sat, 18 Nov 2023 08:02:00 +0900\"},{\"title\":\"\\u003cb\\u003e농협\\u003c/b\\u003e은행, 고객과 직원이 행복한 고객행복센터 운영\",\"originallink\":\"http://www.newsprime.co.kr/news/article.html?no\\u003d582390\",\"link\":\"http://www.newsprime.co.kr/news/article.html?no\\u003d582390\",\"description\":\"1000여명의 직원과 함께 일 평균 5만건의 고객 전화를 응대하고 있는 \\u003cb\\u003e농협\\u003c/b\\u003e은행 콜센터는 용산센터를 비롯... 활용해 \\u003cb\\u003eAICC\\u003c/b\\u003e 추진에 박차를 가하고 있다. 또한, 인천센터 부지 선정 시 상담사의 출퇴근 접근성과 편의성을... \",\"pubDate\":\"Tue, 18 Oct 2022 09:28:00 +0900\"},{\"title\":\"[영상] ECS텔레콤 류기동 박사, \\u0027옴니채널 AI 컨택센터의 고객 경험 가치 창출...\",\"originallink\":\"http://www.aitimes.kr/news/articleView.html?idxno\\u003d20691\",\"link\":\"http://www.aitimes.kr/news/articleView.html?idxno\\u003d20691\",\"description\":\"컨퍼런스(\\u003cb\\u003eAICC\\u003c/b\\u003e 2021)\\u0027가 지난달 30일, 라이브로디브이(LiverTV) 메인 스튜디오에서 온라인 라이브 컨퍼런스로... NH\\u003cb\\u003e농협\\u003c/b\\u003e은행 인공지능 빅데이터 컨택센터 구축 등의 지능형 옴니채널 서비스를 위한 AI 기반의 컨택센터... \",\"pubDate\":\"Sat, 03 Apr 2021 14:46:00 +0900\"}]}", SearchResultVO.class);
+    	SearchResultVO searchResultVO = gson.fromJson("{\"items\":[{\"title\":\"[산업 이모저모]현대자동차, 연구개발 부문 세 자릿수 규모 경력직 채용 나선...\",\"originallink\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d305848\",\"link\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d305848\",\"description\":\"[사진\\u003d현대차] ㅇ..\\u003cb\\u003e기아\\u003c/b\\u003e가 79년 역사를 지닌 모빌리티 기업으로서의 시작점을 재조명한다. \\u003cb\\u003e기아\\u003c/b\\u003e는 1944년... SK텔레콤이 국내 최고 수준의 \\u003cb\\u003eAICC\\u003c/b\\u003e 개발사 페르소나에이아이에 주요 전략적투자자(SI)로 참여해 3대 주주에... \",\"pubDate\":\"Mon, 21 Aug 2023 17:13:00 +0900\"},{\"title\":\"하반기 이통사 수익성 전망에 \\u0027그늘\\u0027...이통사, 모빌리티 신사업 추진\",\"originallink\":\"http://www.metroseoul.co.kr/article/20230815500080\",\"link\":\"http://www.metroseoul.co.kr/article/20230815500080\",\"description\":\"KT는 \\u003cb\\u003eAICC\\u003c/b\\u003e(AI컨택센터) 분야에서 2025년 매출 3000억원을 달성하고, 하반기에 \\u0027믿음\\u0027을 출시해 애플리케이션... 올해부터 현대차 및 \\u003cb\\u003e기아\\u003c/b\\u003e차 등 완성차 브랜드에 커넥티드용 무선통신 회선을 독점 공급하게 된 만큼... \",\"pubDate\":\"Tue, 15 Aug 2023 10:32:00 +0900\"},{\"title\":\"LGU+, 5G·알뜰폰 가입자 성장에 2분기 영업익 16% 증가\",\"originallink\":\"https://biz.chosun.com/it-science/ict/2023/08/08/NGYRDAAGARB5JGBN4PSWNJB6PA/?utm_source\\u003dnaver\\u0026utm_medium\\u003doriginal\\u0026utm_campaign\\u003dbiz\",\"link\":\"https://n.news.naver.com/mnews/article/366/0000922730?sid\\u003d105\",\"description\":\"IDC 사업, 기업인프라 매출 견인… \\u003cb\\u003eAICC\\u003c/b\\u003e·스마트모빌리티 등 B2B 신사업 성과 기업 회선, 솔루션, IDC(인터넷... 그는 “올해 초부터 현대차그룹과의 제휴 확대로 제네시스 등 현대\\u003cb\\u003e기아\\u003c/b\\u003e차 전 차종에 무선통신회선을... \",\"pubDate\":\"Tue, 08 Aug 2023 07:57:00 +0900\"},{\"title\":\"[주간 클라우드 동향/12월②] 4년만에 결정난 美 국방부 클라우드 사업 JWCC\",\"originallink\":\"https://www.ddaily.co.kr/news/article.html?no\\u003d253095\",\"link\":\"https://n.news.naver.com/mnews/article/138/0002138572?sid\\u003d105\",\"description\":\"과거 \\u003cb\\u003e기아\\u003c/b\\u003e 오너스매뉴얼(KIA Owner\\u0027s manual) 구축 프로젝트와 국내 주요 대기업의 수요 예측 프로젝트를... AI 기술을 이용한 AI 클라우드 컨택센터(CC)를 구독형 서비스로 신규 출시, 초기 구축 비용 부담 없이 \\u003cb\\u003eAICC\\u003c/b\\u003e... \",\"pubDate\":\"Mon, 12 Dec 2022 13:52:00 +0900\"},{\"title\":\"AI 역량 강화에 몰두한 통신사들, 핵심 전략은?\",\"originallink\":\"https://www.epnc.co.kr/news/articleView.html?idxno\\u003d238300\",\"link\":\"https://www.epnc.co.kr/news/articleView.html?idxno\\u003d238300\",\"description\":\"계획\\u0026quot;이라며 \\u0026quot;AI컨택센터(\\u003cb\\u003eAICC\\u003c/b\\u003e)나 기가지니 등 기존 KT 사업에도 AI를 적용, 수익성 향상과 KT 그룹 전체의... 현재 LG유플러스는 현대·\\u003cb\\u003e기아\\u003c/b\\u003e차에 \\u0027U+모바일tv\\u0027를 제공하며 인포테인먼트 서비스를 확대 중이다. 로봇... \",\"pubDate\":\"Thu, 09 Nov 2023 11:02:00 +0900\"},{\"title\":\"[산업 이모저모] LG유플러스, 콘텐츠 전문 브랜드 \\u0027STUDIO X+U\\u0027 론칭...티빙 ...\",\"originallink\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d298473\",\"link\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d298473\",\"description\":\"ㅇ..현대자동차·\\u003cb\\u003e기아\\u003c/b\\u003e는 대구광역시 엑스코(EXCO)에서 이달 27일부터 29일까지 열리는 \\u00272022 대구 국제... \\u003cb\\u003eAICC\\u003c/b\\u003e·초거대AI·BigData(CU2.0) 등 DIGICO 기반 기술을 확보하여 상용화 또는 다양한 업종으로 적용을 확대하고, AI인재... \",\"pubDate\":\"Thu, 27 Oct 2022 19:15:00 +0900\"},{\"title\":\"[산업 이모저모] LG유플러스, AI 브랜드 \\u0027익시(ixi)\\u0027 공개...\\u0026quot;친구 같은 AI 플...\",\"originallink\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d298415\",\"link\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d298415\",\"description\":\"스포츠 승부예측 등 놀이 서비스부터 소상공인을 대상으로 한 \\u003cb\\u003eAICC\\u003c/b\\u003e까지 앞으로 LG유플러스의 B2C와 B2B... ㅇ..\\u003cb\\u003e기아\\u003c/b\\u003e의 사회복지관 노후차량 정비지원 사업 \\u0027K-모빌리티 케어\\u0027가 8년째를 맞이했다. \\u003cb\\u003e기아\\u003c/b\\u003e는 25일(화) 서울... \",\"pubDate\":\"Tue, 25 Oct 2022 17:01:00 +0900\"},{\"title\":\"[산업 이모저모] \\u003cb\\u003e기아\\u003c/b\\u003e, 글로벌 누적 판매량 5000만대 돌파…해외 수출 성장이...\",\"originallink\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d289988\",\"link\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d289988\",\"description\":\"\\u003cb\\u003e기아\\u003c/b\\u003e는 전 세계 시장에서 누적 판매량 5000만대를 돌파했습니다.  2017년 누적 판매량 4000만대를 기록한 데... 광주광역시 서구는 지난 2월 전국 최초로 KT \\u003cb\\u003eAICC\\u003c/b\\u003e(AI Contact Center, AI 컨택센터)를 적용한 AI 복지사 서비스를... \",\"pubDate\":\"Thu, 03 Jun 2021 17:04:00 +0900\"},{\"title\":\"[산업 이모저모] \\u003cb\\u003e기아\\u003c/b\\u003e-SK이노베이션, 전기차 배터리 재이용·재활용 체계 공동...\",\"originallink\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d289226\",\"link\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d289226\",\"description\":\"\\u003cb\\u003e기아\\u003c/b\\u003e와 SK이노베이션이 사용을 완료한 전기차 배터리를 친환경적으로 처리 가능한 시스템을 갖추는 데... ㅇ..KT는 개발한 클라우드 기반 인공지능 컨택센터(이하 \\u003cb\\u003eAICC\\u003c/b\\u003e: AI Contact Center) 서비스가 SaaS 표준등급... \",\"pubDate\":\"Thu, 29 Apr 2021 17:16:00 +0900\"},{\"title\":\"LGU+, 2Q 영업익 2880억 원···무선 가입자 두 자릿수↑\",\"originallink\":\"https://www.thereport.co.kr/news/articleView.html?idxno\\u003d39280\",\"link\":\"https://www.thereport.co.kr/news/articleView.html?idxno\\u003d39280\",\"description\":\"그러나 올해 2분기 \\u003cb\\u003eAICC\\u003c/b\\u003e, 메타버스, 스마트팩토리, 스마트모빌리티 등 B2B 신사업의 성과 가시화로 직전... 있다\\u0026quot;며 \\u0026quot;현대·\\u003cb\\u003e기아\\u003c/b\\u003e·제네시스 차에 커넥티드카 통신망 독점 공급, 도요타 차량에 인포테인먼트... \",\"pubDate\":\"Tue, 08 Aug 2023 15:58:00 +0900\"},{\"title\":\"[산업 이모저모]정의선 현대자동차그룹 회장 인도 중장기 모빌리티 전략 점검\",\"originallink\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d305583\",\"link\":\"http://www.greened.kr/news/articleView.html?idxno\\u003d305583\",\"description\":\"정의선 회장은 7일부터 이틀간 현대차·\\u003cb\\u003e기아\\u003c/b\\u003e 인도기술연구소와 현대자동차 인도공장을 둘러보고, 현지... 컨택센터(\\u003cb\\u003eAICC\\u003c/b\\u003e) 도입 및 전환에 소요되는 비용과 시간을 대폭 절감하고 있다고 밝혔다. 카카오 i 커넥트 센터... \",\"pubDate\":\"Tue, 08 Aug 2023 17:31:00 +0900\"},{\"title\":\"수익성 후퇴한 LGU+…\\u0026quot;4분기 회복\\u0026quot; 자신\",\"originallink\":\"http://www.dailyimpact.co.kr/news/articleView.html?idxno\\u003d106043\",\"link\":\"http://www.dailyimpact.co.kr/news/articleView.html?idxno\\u003d106043\",\"description\":\"현재 LG유플러스는 KG모빌리티와 토요타에는 카인포테인먼트 플랫폼을, 현대\\u003cb\\u003e기아\\u003c/b\\u003e자동차에는 U+모바일tv를... B2B 성장 가능성이 큰 AI고객센터(\\u003cb\\u003eAICC\\u003c/b\\u003e) 사업도 확대해나간다. 전기차충전 합작회사 설립도 예정대로... \",\"pubDate\":\"Tue, 07 Nov 2023 14:30:00 +0900\"}],\"Keywords\":[{\"text\":\"기아\",\"value\":12},{\"text\":\"사업\",\"value\":8},{\"text\":\"센터\",\"value\":8},{\"text\":\"티\",\"value\":7},{\"text\":\"빌리\",\"value\":7},{\"text\":\"모\",\"value\":6},{\"text\":\"이모저모\",\"value\":6},{\"text\":\"택\",\"value\":6},{\"text\":\"산업\",\"value\":6},{\"text\":\"서비스\",\"value\":5}]}", SearchResultVO.class);
     	
     	// 네이버 응답 값
     	return searchResultVO;
@@ -172,10 +175,25 @@ public class MainService {
 		// 첫 문장을 기업명으로 예상 (추후 보완 필요)
 		result.setCompany(file.getOriginalFilename().split(" ")[0]);
         
+		/*
         CompletableFuture<Void> apiResponseFuture = CompletableFuture
                 .supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 프로젝트(사업) 배경 및 목적, 사업 개요, 추진 일정을 요약해줘"))
                 .thenCompose(summary -> CompletableFuture.supplyAsync(() -> getGPTAnswer(backText + "이 RFP에서 평가 기준이 뭔지 알려줘"))
                 .thenAccept(evaluationStandard -> {
+                	result.setSummary(summary);
+                    result.setEvaluationStandard(evaluationStandard);
+                }));
+        */
+        
+		CompletableFuture<Void> apiResponseFuture = CompletableFuture
+                .supplyAsync(() -> getGPTAnswer(frontText + "이 RFP에서 1.사업개요, 2.추진일정, 3.요구사항, 4.제안안내사항을 항목을 나눠서 알려줘"))
+                .thenCompose(summary -> CompletableFuture.supplyAsync(() -> getGPTAnswer(backText + "이 RFP에서 1.사업개요, 2.추진일정, 3.요구사항, 4.제안안내사항을 항목을 나눠서 알려줘"))
+                .thenAccept(evaluationStandard -> {
+                	
+                	if (!evaluationStandard.trim().endsWith(".")) {
+                        evaluationStandard += "...";
+                    }
+                	
                 	result.setSummary(summary);
                     result.setEvaluationStandard(evaluationStandard);
                 }));
@@ -190,6 +208,7 @@ public class MainService {
 		// 키워드
         List<Keyword> topKeyWord = findTopWords(text, 10);
 		result.setKeywords(topKeyWord);
+		result.setFileName(file.getOriginalFilename());
 
 		return result;
     }
@@ -236,22 +255,4 @@ public class MainService {
 
         return result;
     }
-    
-    
-    // JSON 데이터 추출, 재조립 함수
-    private String extractJsonData(String input) {
-        int startIndex = input.indexOf("{");
-        if (startIndex == -1) {
-            return "";
-        }
-
-        int endIndex = input.lastIndexOf("}");
-        if (endIndex == -1) {
-            return "";
-        }
-
-        String jsonData = input.substring(startIndex, endIndex + 1);
-        return jsonData;
-    }
-	
 }

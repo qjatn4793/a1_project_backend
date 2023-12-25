@@ -13,5 +13,6 @@ public class PdfResponseVO {
 	private List<Keyword> Keywords;
 	private String summary;
 	private String evaluationStandard;
+	private String fileName;
 	
 }

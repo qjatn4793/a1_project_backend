@@ -11,6 +11,6 @@ public class SearchResultVO {
 	
 	private List<SearchItem> items;
 	
-	private List<GptItem> gptItems;
+	private List<Keyword> Keywords;
 	
 }

@@ -90,6 +90,8 @@ public class MainController {
 	@GetMapping("/searchResult")
     public SearchResultVO searchResult(@RequestParam String item) {
 		
+		log.info("검색 내용 : {}", item);
+		
 		Gson gson = new Gson();
 		
 		// naver api 호출
