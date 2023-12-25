@@ -37,6 +37,7 @@ public class MainController {
 		
 		return "[\"농협\","
 				+ " \"SKB\","
+				+ " \"SK\","
 				+ " \"KT\","
 				+ " \"LG\","
 				+ " \"KB증권\","
@@ -48,8 +49,7 @@ public class MainController {
 				+ " \"삼성\","
 				+ " \"Samsung SDS\","
 				+ " \"삼성 SDS\","
-				+ " \"SK Telecom\","
-				+ " \"LG 일렉트로닉스\","
+				+ " \"SK 텔레콤\","
 				+ " \"쿠팡\","
 				+ " \"우아한 형제들\","
 				+ " \"라인\","
@@ -66,7 +66,6 @@ public class MainController {
 				+ " \"KIA\","
 				+ " \"기아\","
 				+ " \"현대\","
-				+ " \"Hyundai\","
 				+ " \"LG CNS\","
 				+ " \"야나두\"]";
 	}
